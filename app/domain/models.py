@@ -5,26 +5,29 @@ from datetime import date
 
 @dataclass
 class Client:
+    """Entidad que representa a los clientes de la constructora."""
     client_id: str
     client_company_name: str
     client_phone: str
     registration_date: date
-    client_email: Optional[str] = None #Can be Null
+    client_email: Optional[str] = None #Puede ser Null
     
     
 @dataclass
 class Quote:
+    """Entidad que representa una cotización emitida a un cliente."""
     quote_id: str
     client_id: str #FK
     quote_issue_date: date
     quote_job_description: str
     quote_estimated_amount: float
-    quote_status: str #Pending / Approved / Rejected
-    notes: Optional[str] = None #Can be Null
+    quote_status: str #Pendiente / Aprobado / Rechazado
+    notes: Optional[str] = None #Puede ser Null
     
     
 @dataclass
 class Project:
+    """Entidad central del sistema que representa una obra en ejecución."""
     project_id: str
     client_id: str #FK
     quote_id: str #FK
