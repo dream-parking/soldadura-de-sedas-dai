@@ -4,4 +4,4 @@ app = FastAPI()
 
 @app.get("/")
 def root():
-    return {"message": "Soldadura de Sedas API OK"}
+    return ({"message": "Soldadura de Sedas API OK"})
