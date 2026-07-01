@@ -8,8 +8,6 @@ class Material:
 
     def __str__(self):
         return f"Material(id={self.id}, description='{self.description}', specifications='{self.specifications}')"
-<<<<<<< HEAD
-=======
 
 
 @dataclass
@@ -32,4 +30,3 @@ class MaterialProjectDetail:
             f"material_id={self.material_id}, quantity_used={self.quantity_used}, "
             f"unit='{self.unit}', unit_cost={self.unit_cost}, total_cost={self.total_cost})"
         )
->>>>>>> refs/rewritten/SDS-11-US-06-Configurar-ORM-SQLAlchemy-y-mapeo-independiente-del-dominio
