@@ -2,6 +2,7 @@ from datetime import date
 from typing import Optional
 
 from app.domain.models import (
+    Client,
     Worker,
     WorkerAssigment,
     Payroll,
@@ -10,6 +11,8 @@ from app.domain.models import (
     TechnicalMeasurement,
     AccountStatement,
     BiweeklyRequest,
+    Quote,
+    Project
 )
 from app.service_layer.exceptions import (
     WorkerNotFound,
@@ -228,3 +231,97 @@ def registrar_solicitud_quincenal(
     )
     request_repo.add(request)
     return request
+
+#9. registrar cliente
+def registrar_cliente(
+    client_id: str,
+    name: str,
+    email: str,
+    phone: str,
+    client_repo
+) -> Client:
+    client = Client(
+        id=client_id,
+        name=name,
+        email=email,
+        phone=phone
+    )
+    client_repo.add(client)
+    return client
+
+#10. Crear cotización 
+def crear_cotizacion(
+    quote_id: str,
+    client_id: str,
+    project_id: str,
+    quote_date: str,
+    total_amount: float,
+    notes: str,
+    client_repo,
+    project_repo,
+    quote_repo
+)-> Quote:
+    if client_repo.get(client_id) is None:
+        raise ValueError(f"No existe un cliente con id '{client_id}'")
+    _assert_project_exists(project_id, project_repo)
+
+    quote = Quote(
+        id=quote_id,
+        client_id=client_id,
+        project_id=project_id,
+        date=quote_date,
+        total_amount=total_amount,
+        notes=notes
+    )
+    quote_repo.add(quote)
+    return quote
+
+#Aprobar cotización
+def aprobar_cotizacion(
+    quote_id: str,
+    quote_repo,
+    project_repo
+):
+    quote = quote_repo.get(quote_id)
+    if quote is None:
+        raise ValueError(f"No existe una cotización con id '{quote_id}'")
+    quote.status = "Aprobado"
+    """Se crea el proyecto asociado a la cotización aprobada"""
+    quote_repo.update(quote)
+    proyecto = Project(
+        project_id=quote.project_id,
+        client_id=quote.client_id,
+        quote_id=quote.quote_id,
+        project_name="Nombre del proyecto",
+        project_location="Ubicación del proyecto",
+        project_start_date=date.today(),
+        project_total_cost=quote.total_amount,
+        project_status="In Progress"
+    )
+    project_repo.add(proyecto)
+    return quote
+
+"""Metodos creados para definir atributos de proyecto"""
+def definir_nombre_proyecto(
+    project_id: str,
+    new_name: str,
+    project_repo
+):
+    project = project_repo.get(project_id)
+    if project is None:
+        raise ValueError(f"No existe un proyecto con id '{project_id}'")
+    project.project_name = new_name
+    project_repo.update(project)
+    return project
+
+def definir_ubicacion_proyecto(
+    project_id: str,
+    new_location: str,
+    project_repo
+):
+    project = project_repo.get(project_id)
+    if project is None:
+        raise ValueError(f"No existe un proyecto con id '{project_id}'")
+    project.project_location = new_location
+    project_repo.update(project)
+    return project
