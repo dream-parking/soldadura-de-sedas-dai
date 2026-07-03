@@ -130,6 +130,7 @@ class DetalleMaterialesObra:
             f"material_id='{self.material_id}', used_quantity={self.used_quantity}, "
             f"measurement_unit='{self.measurement_unit}')"
         )
+        
 @dataclass
 class BiweeklyRequest:
     id: str
