@@ -117,7 +117,7 @@ class Material:
         return f"Material(id={self.id}, description='{self.description}', specifications='{self.specifications}')"
 
 @dataclass
-class DetalleMaterialesObra:
+class MaterialUsageDetail:
     """Entidad que representa el detalle de materiales utilizados en cada proyecto."""
     project_id: str      # FK a Project
     material_id: str     # FK a Material
@@ -126,7 +126,7 @@ class DetalleMaterialesObra:
 
     def __str__(self):
         return (
-            f"DetalleMaterialesObra(project_id='{self.project_id}', "
+            f"MaterialUsageDetail(project_id='{self.project_id}', "
             f"material_id='{self.material_id}', used_quantity={self.used_quantity}, "
             f"measurement_unit='{self.measurement_unit}')"
         )

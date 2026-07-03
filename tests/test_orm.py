@@ -6,8 +6,7 @@ from sqlalchemy.orm import Session, clear_mappers
 
 from app.adapters import orm
 from app.domain import models
-from app.domain.models import Material, DetalleMaterialesObra
-
+from app.domain.models import Material, MaterialUsageDetail
 
 @pytest.fixture
 def session():
@@ -50,15 +49,15 @@ def test_worker_assignments_relationship(session):
     assert [a.assignment_id for a in retrieved.assignments] == ["a1"]
 
 
-def test_detalle_materiales_obra_round_trip(session):
+def test_material_usage_detail_round_trip(session):
     material = Material(id="m1", description="Varilla", specifications="1/2 pulgada")
-    detalle = DetalleMaterialesObra(
+    usage_detail = MaterialUsageDetail(
         project_id="p1", material_id="m1", used_quantity=10, measurement_unit="unidad"
     )
     session.add(material)
-    session.add(detalle)
+    session.add(usage_detail)
     session.commit()
 
-    retrieved = session.get(DetalleMaterialesObra, ("p1", "m1"))
+    retrieved = session.get(MaterialUsageDetail, ("p1", "m1"))
     assert retrieved.used_quantity == 10
     assert retrieved.measurement_unit == "unidad"

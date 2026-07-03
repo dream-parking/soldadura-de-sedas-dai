@@ -2,12 +2,12 @@ from abc import ABC, abstractmethod
 from typing import Callable, Optional
 
 from app.adapters.repository import (
-    AbstractDetalleMaterialesObraRepository,
+    AbstractMaterialUsageDetailRepository,
     AbstractRepository,
     FakeAccountStatementRepository,
     FakeBiweeklyRequestRepository,
     FakeClientRepository,
-    FakeDetalleMaterialesObraRepository,
+    FakeMaterialUsageDetailRepository,
     FakeMaterialRepository,
     FakePayrollRepository,
     FakeProjectRepository,
@@ -18,7 +18,7 @@ from app.adapters.repository import (
     SqlAlchemyAccountStatementRepository,
     SqlAlchemyBiweeklyRequestRepository,
     SqlAlchemyClientRepository,
-    SqlAlchemyDetalleMaterialesObraRepository,
+    SqlAlchemyMaterialUsageDetailRepository,
     SqlAlchemyMaterialRepository,
     SqlAlchemyPayrollRepository,
     SqlAlchemyProjectRepository,
@@ -39,7 +39,7 @@ class AbstractUnitOfWork(ABC):
     worker_assignments: AbstractRepository
     payrolls: AbstractRepository
     materials: AbstractRepository
-    detalle_materiales: AbstractDetalleMaterialesObraRepository
+    material_usage_details: AbstractMaterialUsageDetailRepository
     technical_measurements: AbstractRepository
     biweekly_requests: AbstractRepository
     account_statements: AbstractRepository
@@ -79,7 +79,7 @@ class SqlAlchemyUnitOfWork(AbstractUnitOfWork):
         self.worker_assignments = None
         self.payrolls = None
         self.materials = None
-        self.detalle_materiales = None
+        self.material_usage_details = None
         self.technical_measurements = None
         self.biweekly_requests = None
         self.account_statements = None
@@ -93,7 +93,7 @@ class SqlAlchemyUnitOfWork(AbstractUnitOfWork):
         self.worker_assignments = SqlAlchemyWorkerAssignmentRepository(self.session)
         self.payrolls = SqlAlchemyPayrollRepository(self.session)
         self.materials = SqlAlchemyMaterialRepository(self.session)
-        self.detalle_materiales = SqlAlchemyDetalleMaterialesObraRepository(self.session)
+        self.material_usage_details = SqlAlchemyMaterialUsageDetailRepository(self.session)
         self.technical_measurements = SqlAlchemyTechnicalMeasurementRepository(self.session)
         self.biweekly_requests = SqlAlchemyBiweeklyRequestRepository(self.session)
         self.account_statements = SqlAlchemyAccountStatementRepository(self.session)
@@ -133,7 +133,7 @@ class FakeUnitOfWork(AbstractUnitOfWork):
         assignments: Optional[list] = None,
         payrolls: Optional[list] = None,
         materials: Optional[list] = None,
-        detalles: Optional[list] = None,
+        material_usage_details: Optional[list] = None,
         measurements: Optional[list] = None,
         biweekly_requests: Optional[list] = None,
         account_statements: Optional[list] = None,
@@ -145,7 +145,7 @@ class FakeUnitOfWork(AbstractUnitOfWork):
         self.worker_assignments = FakeWorkerAssignmentRepository(assignments)
         self.payrolls = FakePayrollRepository(payrolls)
         self.materials = FakeMaterialRepository(materials)
-        self.detalle_materiales = FakeDetalleMaterialesObraRepository(detalles)
+        self.material_usage_details = FakeMaterialUsageDetailRepository(material_usage_details)
         self.technical_measurements = FakeTechnicalMeasurementRepository(measurements)
         self.biweekly_requests = FakeBiweeklyRequestRepository(biweekly_requests)
         self.account_statements = FakeAccountStatementRepository(account_statements)

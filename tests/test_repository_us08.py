@@ -6,7 +6,7 @@ from app.domain.models import (
     WorkerAssigment,
     Payroll,
     Material,
-    DetalleMaterialesObra,
+    MaterialUsageDetail,
     TechnicalMeasurement,
     BiweeklyRequest,
     AccountStatement,
@@ -17,7 +17,7 @@ from app.adapters.repository import (
     FakeWorkerAssignmentRepository,
     FakePayrollRepository,
     FakeMaterialRepository,
-    FakeDetalleMaterialesObraRepository,
+    FakeMaterialUsageDetailRepository,
     FakeTechnicalMeasurementRepository,
     FakeBiweeklyRequestRepository,
     FakeAccountStatementRepository,
@@ -99,37 +99,37 @@ def test_material_repository_add_and_get():
     assert repo.get(1).description == "Lamina galvanizada"
 
 
-# Detalle de materiales por obra (PK compuesta)
-def test_detalle_materiales_obra_add_and_get():
-    repo = FakeDetalleMaterialesObraRepository()
-    detalle = DetalleMaterialesObra(
+# Detalle de uso de materiales por obra (PK compuesta)
+def test_material_usage_detail_add_and_get():
+    repo = FakeMaterialUsageDetailRepository()
+    usage_detail = MaterialUsageDetail(
         project_id="P001",
         material_id="M001",
         used_quantity=25.5,
         measurement_unit="metros",
     )
-    repo.add(detalle)
+    repo.add(usage_detail)
 
     resultado = repo.get("P001", "M001")
     assert resultado.used_quantity == 25.5
 
 
-def test_detalle_materiales_obra_update():
-    repo = FakeDetalleMaterialesObraRepository()
-    detalle = DetalleMaterialesObra("P001", "M001", 25.5, "metros")
-    repo.add(detalle)
+def test_material_usage_detail_update():
+    repo = FakeMaterialUsageDetailRepository()
+    usage_detail = MaterialUsageDetail("P001", "M001", 25.5, "metros")
+    repo.add(usage_detail)
 
-    actualizado = DetalleMaterialesObra("P001", "M001", 30.0, "metros")
+    actualizado = MaterialUsageDetail("P001", "M001", 30.0, "metros")
     repo.update(actualizado)
 
     assert repo.get("P001", "M001").used_quantity == 30.0
 
 
-def test_detalle_materiales_obra_identidad_compuesta():
+def test_material_usage_detail_identidad_compuesta():
     """Dos registros con distinto material en el mismo proyecto son entidades distintas."""
-    repo = FakeDetalleMaterialesObraRepository()
-    repo.add(DetalleMaterialesObra("P001", "M001", 10.0, "unidades"))
-    repo.add(DetalleMaterialesObra("P001", "M002", 5.0, "pies"))
+    repo = FakeMaterialUsageDetailRepository()
+    repo.add(MaterialUsageDetail("P001", "M001", 10.0, "unidades"))
+    repo.add(MaterialUsageDetail("P001", "M002", 5.0, "pies"))
 
     assert len(repo.list()) == 2
     assert repo.get("P001", "M001").used_quantity == 10.0

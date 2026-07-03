@@ -8,7 +8,7 @@ from app.adapters.repository import (
     FakeWorkerAssignmentRepository,
     FakePayrollRepository,
     FakeMaterialRepository,
-    FakeDetalleMaterialesObraRepository,
+    FakeMaterialUsageDetailRepository,
     FakeTechnicalMeasurementRepository,
     FakeAccountStatementRepository,
     FakeBiweeklyRequestRepository,
@@ -187,49 +187,49 @@ def test_agregar_material():
 def test_registrar_uso_material_en_obra_ok():
     project_repo = FakeProjectRepository()
     material_repo = FakeMaterialRepository()
-    detalle_repo = FakeDetalleMaterialesObraRepository()
+    usage_detail_repo = FakeMaterialUsageDetailRepository()
 
     _crear_proyecto_de_prueba(project_repo)
     services.agregar_material(1, "Lamina galvanizada", "Calibre 26", material_repo)
 
-    detalle = services.registrar_uso_material_en_obra(
+    usage_detail = services.registrar_uso_material_en_obra(
         project_id="P001",
         material_id=1,
         used_quantity=25.5,
         measurement_unit="metros",
         project_repo=project_repo,
         material_repo=material_repo,
-        detalle_repo=detalle_repo,
+        usage_detail_repo=usage_detail_repo,
     )
 
-    assert detalle_repo.get("P001", 1).used_quantity == 25.5
+    assert usage_detail_repo.get("P001", 1).used_quantity == 25.5
 
 
 def test_registrar_uso_material_en_obra_material_inexistente():
     project_repo = FakeProjectRepository()
     material_repo = FakeMaterialRepository()
-    detalle_repo = FakeDetalleMaterialesObraRepository()
+    usage_detail_repo = FakeMaterialUsageDetailRepository()
 
     _crear_proyecto_de_prueba(project_repo)
 
     with pytest.raises(MaterialNotFound):
         services.registrar_uso_material_en_obra(
             "P001", 999, 25.5, "metros",
-            project_repo, material_repo, detalle_repo,
+            project_repo, material_repo, usage_detail_repo,
         )
 
 
 def test_registrar_uso_material_en_obra_proyecto_inexistente():
     project_repo = FakeProjectRepository()
     material_repo = FakeMaterialRepository()
-    detalle_repo = FakeDetalleMaterialesObraRepository()
+    usage_detail_repo = FakeMaterialUsageDetailRepository()
 
     services.agregar_material(1, "Lamina galvanizada", "Calibre 26", material_repo)
 
     with pytest.raises(ProjectNotFound):
         services.registrar_uso_material_en_obra(
             "P999", 1, 25.5, "metros",
-            project_repo, material_repo, detalle_repo,
+            project_repo, material_repo, usage_detail_repo,
         )
 
 

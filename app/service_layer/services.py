@@ -7,7 +7,7 @@ from app.domain.models import (
     WorkerAssigment,
     Payroll,
     Material,
-    DetalleMaterialesObra,
+    MaterialUsageDetail,
     TechnicalMeasurement,
     AccountStatement,
     BiweeklyRequest,
@@ -143,19 +143,19 @@ def registrar_uso_material_en_obra(
     measurement_unit: str,
     project_repo,
     material_repo,
-    detalle_repo,
-) -> DetalleMaterialesObra:
+    usage_detail_repo,
+) -> MaterialUsageDetail:
     _assert_project_exists(project_id, project_repo)
     _assert_material_exists(material_id, material_repo)
 
-    detalle = DetalleMaterialesObra(
+    usage_detail = MaterialUsageDetail(
         project_id=project_id,
         material_id=material_id,
         used_quantity=used_quantity,
         measurement_unit=measurement_unit,
     )
-    detalle_repo.add(detalle)
-    return detalle
+    usage_detail_repo.add(usage_detail)
+    return usage_detail
 
 
 # 6. Registrar medida técnica

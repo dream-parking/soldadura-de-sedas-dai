@@ -151,20 +151,20 @@ class MaterialRead(MaterialBase):
     model_config = ConfigDict(from_attributes=True)
 
 
-# Detalle de materiales por obra
+# Detalle de uso de materiales por obra
 
-class DetalleMaterialesObraBase(BaseModel):
+class MaterialUsageDetailBase(BaseModel):
     project_id: str = Field(..., min_length=1, max_length=5)
     material_id: str = Field(..., min_length=1, max_length=5)
     used_quantity: float = Field(..., gt=0)
     measurement_unit: str = Field(..., min_length=1, max_length=10)
 
 
-class DetalleMaterialesObraCreate(DetalleMaterialesObraBase):
+class MaterialUsageDetailCreate(MaterialUsageDetailBase):
     pass
 
 
-class DetalleMaterialesObraRead(DetalleMaterialesObraBase):
+class MaterialUsageDetailRead(MaterialUsageDetailBase):
     model_config = ConfigDict(from_attributes=True)
 
 

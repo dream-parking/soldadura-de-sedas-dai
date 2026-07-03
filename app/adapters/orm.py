@@ -87,9 +87,9 @@ materials = Table(
     Column("specifications", String(300), nullable=False),
 )
 
-# Detalle de materiales por obra
-detalle_materiales_obra = Table(
-    "detalle_materiales_obra",
+# Detalle de uso de materiales por obra
+material_usage_details = Table(
+    "material_usage_details",
     mapper_registry.metadata,
     Column("project_id", String(5), ForeignKey("projects.project_id"), primary_key=True),
     Column("material_id", String(5), ForeignKey("materials.id"), primary_key=True),
@@ -150,7 +150,7 @@ def start_mappers():
     mapper_registry.map_imperatively(models.WorkerAssigment, worker_assignments)
     mapper_registry.map_imperatively(models.Payroll, payrolls)
     mapper_registry.map_imperatively(models.Material, materials)
-    mapper_registry.map_imperatively(models.DetalleMaterialesObra, detalle_materiales_obra)
+    mapper_registry.map_imperatively(models.MaterialUsageDetail, material_usage_details)
     mapper_registry.map_imperatively(models.TechnicalMeasurement, technical_measurements)
     mapper_registry.map_imperatively(models.BiweeklyRequest, biweekly_requests)
     mapper_registry.map_imperatively(models.AccountStatement, account_statements)

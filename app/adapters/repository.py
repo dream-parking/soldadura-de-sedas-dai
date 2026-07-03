@@ -10,7 +10,7 @@ from app.domain.models import (
     WorkerAssigment,
     Payroll,
     Material,
-    DetalleMaterialesObra,
+    MaterialUsageDetail,
     TechnicalMeasurement,
     BiweeklyRequest,
     AccountStatement,
@@ -37,14 +37,14 @@ class AbstractRepository(ABC):
         raise NotImplementedError
 
 
-class AbstractDetalleMaterialesObraRepository(ABC):
+class AbstractMaterialUsageDetailRepository(ABC):
     """
-    Interfaz separada ya  DetalleMaterialesObra no tiene un ID único
-    <su identidad es la combinación (project_id, material_id)>>>:9
+    Interfaz separada ya que MaterialUsageDetail no tiene un ID único:
+    su identidad es la combinación (project_id, material_id).
     """
 
     @abstractmethod
-    def add(self, entity: DetalleMaterialesObra):
+    def add(self, entity: MaterialUsageDetail):
         raise NotImplementedError
 
     @abstractmethod
@@ -52,11 +52,11 @@ class AbstractDetalleMaterialesObraRepository(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def list(self) -> List[DetalleMaterialesObra]:
+    def list(self) -> List[MaterialUsageDetail]:
         raise NotImplementedError
 
     @abstractmethod
-    def update(self, entity: DetalleMaterialesObra):
+    def update(self, entity: MaterialUsageDetail):
         raise NotImplementedError
 
 
@@ -333,53 +333,53 @@ class FakeMaterialRepository(AbstractRepository):
         self._materials.append(material)
 
 
-# Detalle de materiales por obra
-class SqlAlchemyDetalleMaterialesObraRepository(AbstractDetalleMaterialesObraRepository):
+# Detalle de uso de materiales por obra
+class SqlAlchemyMaterialUsageDetailRepository(AbstractMaterialUsageDetailRepository):
     def __init__(self, session):
         self.session = session
 
-    def add(self, detalle: DetalleMaterialesObra):
-        self.session.add(detalle)
+    def add(self, usage_detail: MaterialUsageDetail):
+        self.session.add(usage_detail)
 
-    def get(self, project_id: str, material_id: str) -> Optional[DetalleMaterialesObra]:
+    def get(self, project_id: str, material_id: str) -> Optional[MaterialUsageDetail]:
         return (
-            self.session.query(DetalleMaterialesObra)
+            self.session.query(MaterialUsageDetail)
             .filter_by(project_id=project_id, material_id=material_id)
             .first()
         )
 
-    def list(self) -> List[DetalleMaterialesObra]:
-        return self.session.query(DetalleMaterialesObra).all()
+    def list(self) -> List[MaterialUsageDetail]:
+        return self.session.query(MaterialUsageDetail).all()
 
-    def update(self, detalle: DetalleMaterialesObra):
-        self.session.merge(detalle)
+    def update(self, usage_detail: MaterialUsageDetail):
+        self.session.merge(usage_detail)
 
 
-class FakeDetalleMaterialesObraRepository(AbstractDetalleMaterialesObraRepository):
-    def __init__(self, detalles: Optional[List[DetalleMaterialesObra]] = None):
-        self._detalles = list(detalles) if detalles else []
+class FakeMaterialUsageDetailRepository(AbstractMaterialUsageDetailRepository):
+    def __init__(self, usage_details: Optional[List[MaterialUsageDetail]] = None):
+        self._usage_details = list(usage_details) if usage_details else []
 
-    def add(self, detalle: DetalleMaterialesObra):
-        self._detalles.append(detalle)
+    def add(self, usage_detail: MaterialUsageDetail):
+        self._usage_details.append(usage_detail)
 
-    def get(self, project_id: str, material_id: str) -> Optional[DetalleMaterialesObra]:
+    def get(self, project_id: str, material_id: str) -> Optional[MaterialUsageDetail]:
         return next(
             (
-                d for d in self._detalles
+                d for d in self._usage_details
                 if d.project_id == project_id and d.material_id == material_id
             ),
             None,
         )
 
-    def list(self) -> List[DetalleMaterialesObra]:
-        return list(self._detalles)
+    def list(self) -> List[MaterialUsageDetail]:
+        return list(self._usage_details)
 
-    def update(self, detalle: DetalleMaterialesObra):
-        for i, d in enumerate(self._detalles):
-            if d.project_id == detalle.project_id and d.material_id == detalle.material_id:
-                self._detalles[i] = detalle
+    def update(self, usage_detail: MaterialUsageDetail):
+        for i, d in enumerate(self._usage_details):
+            if d.project_id == usage_detail.project_id and d.material_id == usage_detail.material_id:
+                self._usage_details[i] = usage_detail
                 return
-        self._detalles.append(detalle)
+        self._usage_details.append(usage_detail)
 
 
 # Medición técnica

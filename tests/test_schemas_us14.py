@@ -13,7 +13,7 @@ from app.entrypoints.schemas import (
     WorkerAssignmentCreate,
     PayrollCreate,
     MaterialCreate,
-    DetalleMaterialesObraCreate,
+    MaterialUsageDetailCreate,
     TechnicalMeasurementCreate,
     BiweeklyRequestCreate,
     AccountStatementCreate,
@@ -152,9 +152,9 @@ def test_material_create_rejects_empty_description():
         MaterialCreate(id="M001", description="", specifications="1/2 pulgada")
 
 
-def test_detalle_materiales_obra_create_rejects_zero_quantity():
+def test_material_usage_detail_create_rejects_zero_quantity():
     with pytest.raises(ValidationError):
-        DetalleMaterialesObraCreate(
+        MaterialUsageDetailCreate(
             project_id="P001", material_id="M001", used_quantity=0, measurement_unit="unidad"
         )
 
