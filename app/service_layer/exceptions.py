@@ -1,12 +1,16 @@
-class WorkerNotFound(Exception):
+class NotFoundError(Exception):
+    """Excepción base para recursos de dominio que no existen."""
+
+
+class WorkerNotFound(NotFoundError):
     """El trabajador solicitado no existe :c"""
 
 
-class ProjectNotFound(Exception):
+class ProjectNotFound(NotFoundError):
     """El proyecto solicitado no existe :cc"""
 
 
-class MaterialNotFound(Exception):
+class MaterialNotFound(NotFoundError):
     """El material solicitado no existe """
 
 
