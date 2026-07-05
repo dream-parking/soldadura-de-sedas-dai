@@ -15,6 +15,7 @@ from app.domain.models import (
     Project
 )
 from app.service_layer.exceptions import (
+    ClientNotFound,
     WorkerNotFound,
     ProjectNotFound,
     MaterialNotFound,
@@ -28,6 +29,13 @@ def _get_worker_or_raise(worker_id: str, worker_repo) -> Worker:
     if worker is None:
         raise WorkerNotFound(f"No existe un trabajador con id '{worker_id}'")
     return worker
+
+
+def _get_client_or_raise(client_id: str, client_repo) -> Client:
+    client = client_repo.get(client_id)
+    if client is None:
+        raise ClientNotFound(f"No existe un cliente con id '{client_id}'")
+    return client
 
 
 def _assert_project_exists(project_id: str, project_repo) -> None:
@@ -232,21 +240,55 @@ def registrar_solicitud_quincenal(
     request_repo.add(request)
     return request
 
-#9. registrar cliente
+#9. Registrar cliente
 def registrar_cliente(
     client_id: str,
-    name: str,
-    email: str,
-    phone: str,
-    client_repo
+    client_company_name: str,
+    client_phone: str,
+    registration_date: date,
+    client_repo,
+    client_email: Optional[str] = None,
 ) -> Client:
     client = Client(
-        id=client_id,
-        name=name,
-        email=email,
-        phone=phone
+        client_id=client_id,
+        client_company_name=client_company_name,
+        client_phone=client_phone,
+        registration_date=registration_date,
+        client_email=client_email,
     )
     client_repo.add(client)
+    return client
+
+
+# 9b. Consultar cliente por id
+def obtener_cliente(client_id: str, client_repo) -> Client:
+    return _get_client_or_raise(client_id, client_repo)
+
+
+# 9c. Listar clientes
+def listar_clientes(client_repo) -> list[Client]:
+    return client_repo.list()
+
+
+# 9d. Actualizar cliente
+def actualizar_cliente(
+    client_id: str,
+    client_company_name: str,
+    client_phone: str,
+    registration_date: date,
+    client_repo,
+    client_email: Optional[str] = None,
+) -> Client:
+    _get_client_or_raise(client_id, client_repo)
+
+    client = Client(
+        client_id=client_id,
+        client_company_name=client_company_name,
+        client_phone=client_phone,
+        registration_date=registration_date,
+        client_email=client_email,
+    )
+    client_repo.update(client)
     return client
 
 #10. Crear cotización 
