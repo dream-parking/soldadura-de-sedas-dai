@@ -35,6 +35,15 @@ class ClientCreate(ClientBase):
     pass
 
 
+class ClientUpdate(BaseModel):
+    """Body para actualizar un cliente existente; el client_id viene de la URL."""
+
+    client_company_name: str = Field(..., min_length=1, max_length=200)
+    client_phone: str = Field(..., min_length=1, max_length=30)
+    registration_date: date
+    client_email: Optional[EmailStr] = None
+
+
 class ClientRead(ClientBase):
     model_config = ConfigDict(from_attributes=True)
 

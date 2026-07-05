@@ -2,6 +2,10 @@ class NotFoundError(Exception):
     """Excepción base para recursos de dominio que no existen."""
 
 
+class ClientNotFound(NotFoundError):
+    """El cliente solicitado no existe"""
+
+
 class WorkerNotFound(NotFoundError):
     """El trabajador solicitado no existe :c"""
 
