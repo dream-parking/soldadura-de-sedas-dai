@@ -60,12 +60,26 @@ class QuoteBase(BaseModel):
     notes: Optional[str] = Field(default=None, max_length=500)
 
 
-class QuoteCreate(QuoteBase):
-    pass
+class QuoteCreate(BaseModel):
+    """Body para crear una cotización; el estado inicial siempre es 'Pendiente'
+    y lo asigna el service layer, por lo que no se solicita aquí."""
+
+    quote_id: str = Field(..., min_length=1, max_length=50)
+    client_id: str = Field(..., min_length=1, max_length=50)
+    quote_issue_date: date
+    quote_job_description: str = Field(..., min_length=1, max_length=500)
+    quote_estimated_amount: float = Field(..., ge=0)
+    notes: Optional[str] = Field(default=None, max_length=500)
 
 
 class QuoteRead(QuoteBase):
     model_config = ConfigDict(from_attributes=True)
+
+
+class QuoteStatusUpdate(BaseModel):
+    """Body para cambiar el estado de una cotización."""
+
+    quote_status: Literal["Pendiente", "Aprobado", "Rechazado"]
 
 
 # Proyectos
@@ -84,6 +98,25 @@ class ProjectBase(BaseModel):
 
 class ProjectCreate(ProjectBase):
     pass
+
+
+class ProjectCreateFromQuote(BaseModel):
+    """Body para crear un proyecto a partir de una cotización aprobada.
+    client_id y project_total_cost se derivan de la cotización, por lo
+    que no se solicitan aquí."""
+
+    project_id: str = Field(..., min_length=1, max_length=5)
+    quote_id: str = Field(..., min_length=1, max_length=50)
+    project_name: str = Field(..., min_length=1, max_length=200)
+    project_location: str = Field(..., min_length=1, max_length=200)
+    project_start_date: date
+    project_estimated_end_date: Optional[date] = None
+
+
+class ProjectStatusUpdate(BaseModel):
+    """Body para cambiar el estado de un proyecto."""
+
+    project_status: Literal["In Progress", "Completed"]
 
 
 class ProjectRead(ProjectBase):
@@ -116,8 +149,13 @@ class WorkerAssignmentBase(BaseModel):
     assignment_date: date
 
 
-class WorkerAssignmentCreate(WorkerAssignmentBase):
-    pass
+class WorkerAssignmentCreate(BaseModel):
+    """Body para asignar un trabajador a un proyecto; worker_id viene de la
+    URL (/workers/{worker_id}/assignments), no se repite en el body."""
+
+    assignment_id: str = Field(..., min_length=1, max_length=5)
+    project_id: str = Field(..., min_length=1, max_length=5)
+    assignment_date: date
 
 
 class WorkerAssignmentRead(WorkerAssignmentBase):
