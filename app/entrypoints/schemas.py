@@ -137,11 +137,21 @@ class PayrollBase(BaseModel):
 
 
 class PayrollCreate(PayrollBase):
-    pass
+    pass  
 
 
 class PayrollRead(PayrollBase):
     model_config = ConfigDict(from_attributes=True)
+
+class PayrollUpdate(BaseModel):
+    """Body para actualizar un PayRoll existente; el client_id viene de la URL."""
+
+    worker_id: str = Field(..., min_length=1, max_length=5)
+    project_id: str = Field(..., min_length=1, max_length=5)
+    payroll_fortnight_period: str = Field(..., min_length=1, max_length=30)
+    payroll_payment_date: date
+    payroll_hours_worked: Optional[float] = Field(default=None, ge=0)
+    payroll_paid_amount: Optional[float] = Field(default=None, ge=0)
 
 
 # Materiales
