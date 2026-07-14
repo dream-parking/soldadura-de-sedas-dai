@@ -1,13 +1,20 @@
 """app/entrypoints/routers/__init__.py
 
-Router principal de la API: agrega los routers de cada recurso.
-Los endpoints CRUD de cada entidad (Épica 2) se registran aquí conforme se implementen.
+Agrupa todos los routers de la API bajo un único api_router,
+que main.py monta con el prefijo /api.
 """
 from fastapi import APIRouter
 
 from app.entrypoints.routers.clients import router as clients_router
 from app.entrypoints.routers.health import router as health_router
+from app.entrypoints.routers.quotes import router as quotes_router
+from app.entrypoints.routers.projects import router as projects_router
+from app.entrypoints.routers.workers import router as workers_router
 
 api_router = APIRouter()
+
 api_router.include_router(health_router)
 api_router.include_router(clients_router)
+api_router.include_router(quotes_router)
+api_router.include_router(projects_router)
+api_router.include_router(workers_router)

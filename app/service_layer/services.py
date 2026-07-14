@@ -19,6 +19,8 @@ from app.service_layer.exceptions import (
     WorkerNotFound,
     ProjectNotFound,
     MaterialNotFound,
+    QuoteNotFound,
+    QuoteNotApproved,
 )
 
 
@@ -46,6 +48,13 @@ def _assert_project_exists(project_id: str, project_repo) -> None:
 def _assert_material_exists(material_id, material_repo) -> None:
     if material_repo.get(material_id) is None:
         raise MaterialNotFound(f"No existe un material con id '{material_id}'")
+
+
+def _get_quote_or_raise(quote_id: str, quote_repo) -> Quote:
+    quote = quote_repo.get(quote_id)
+    if quote is None:
+        raise QuoteNotFound(f"No existe una cotización con id '{quote_id}'")
+    return quote
 
 
 # Registrar trabajador
@@ -291,57 +300,153 @@ def actualizar_cliente(
     client_repo.update(client)
     return client
 
-#10. Crear cotización 
+
+# 10. Crear cotización
 def crear_cotizacion(
     quote_id: str,
     client_id: str,
-    project_id: str,
-    quote_date: str,
-    total_amount: float,
-    notes: str,
+    quote_issue_date: date,
+    quote_job_description: str,
+    quote_estimated_amount: float,
     client_repo,
-    project_repo,
-    quote_repo
-)-> Quote:
-    if client_repo.get(client_id) is None:
-        raise ValueError(f"No existe un cliente con id '{client_id}'")
-    _assert_project_exists(project_id, project_repo)
+    quote_repo,
+    notes: Optional[str] = None,
+) -> Quote:
+    _get_client_or_raise(client_id, client_repo)
 
     quote = Quote(
-        id=quote_id,
+        quote_id=quote_id,
         client_id=client_id,
-        project_id=project_id,
-        date=quote_date,
-        total_amount=total_amount,
-        notes=notes
+        quote_issue_date=quote_issue_date,
+        quote_job_description=quote_job_description,
+        quote_estimated_amount=quote_estimated_amount,
+        quote_status="Pendiente",
+        notes=notes,
     )
     quote_repo.add(quote)
     return quote
 
-#Aprobar cotización
-def aprobar_cotizacion(
-    quote_id: str,
-    quote_repo,
-    project_repo
-):
-    quote = quote_repo.get(quote_id)
-    if quote is None:
-        raise ValueError(f"No existe una cotización con id '{quote_id}'")
-    quote.status = "Aprobado"
-    """Se crea el proyecto asociado a la cotización aprobada"""
+
+# 10b. Consultar cotización por id
+def obtener_cotizacion(quote_id: str, quote_repo) -> Quote:
+    return _get_quote_or_raise(quote_id, quote_repo)
+
+
+# 10c. Listar cotizaciones por cliente
+def listar_cotizaciones_por_cliente(client_id: str, client_repo, quote_repo) -> list[Quote]:
+    _get_client_or_raise(client_id, client_repo)
+    return [q for q in quote_repo.list() if q.client_id == client_id]
+
+
+# 10d. Actualizar estado de cotización (uso general)
+def actualizar_estado_cotizacion(quote_id: str, new_status: str, quote_repo) -> Quote:
+    quote = _get_quote_or_raise(quote_id, quote_repo)
+
+    valid_statuses = {"Pendiente", "Aprobado", "Rechazado"}
+    if new_status not in valid_statuses:
+        raise ValueError(
+            f"Estado '{new_status}' inválido. Debe ser uno de: {valid_statuses}"
+        )
+
+    quote.quote_status = new_status
     quote_repo.update(quote)
-    proyecto = Project(
-        project_id=quote.project_id,
-        client_id=quote.client_id,
-        quote_id=quote.quote_id,
-        project_name="Nombre del proyecto",
-        project_location="Ubicación del proyecto",
-        project_start_date=date.today(),
-        project_total_cost=quote.total_amount,
-        project_status="In Progress"
-    )
-    project_repo.add(proyecto)
     return quote
+
+
+# 10e. Aprobar cotización
+def aprobar_cotizacion(quote_id: str, quote_repo) -> Quote:
+    return actualizar_estado_cotizacion(quote_id, "Aprobado", quote_repo)
+
+
+# 10f. Rechazar cotización
+def rechazar_cotizacion(quote_id: str, quote_repo) -> Quote:
+    return actualizar_estado_cotizacion(quote_id, "Rechazado", quote_repo)
+
+
+# 11. Crear proyecto desde cotización aprobada
+def crear_proyecto_desde_cotizacion(
+    project_id: str,
+    quote_id: str,
+    project_name: str,
+    project_location: str,
+    project_start_date: date,
+    quote_repo,
+    project_repo,
+    project_estimated_end_date: Optional[date] = None,
+) -> Project:
+    quote = _get_quote_or_raise(quote_id, quote_repo)
+
+    if quote.quote_status != "Aprobado":
+        raise QuoteNotApproved(
+            f"La cotización '{quote_id}' está en estado '{quote.quote_status}'; "
+            f"solo se puede crear un proyecto desde una cotización Aprobada."
+        )
+
+    project = Project(
+        project_id=project_id,
+        client_id=quote.client_id,
+        quote_id=quote_id,
+        project_name=project_name,
+        project_location=project_location,
+        project_start_date=project_start_date,
+        project_total_cost=quote.quote_estimated_amount,
+        project_status="In Progress",
+        project_estimated_end_date=project_estimated_end_date,
+    )
+    project_repo.add(project)
+    return project
+
+
+# 11b. Consultar proyecto por id
+def obtener_proyecto(project_id: str, project_repo) -> Project:
+    project = project_repo.get(project_id)
+    if project is None:
+        raise ProjectNotFound(f"No existe un proyecto con id '{project_id}'")
+    return project
+
+
+# 11c. Listar proyectos por cliente
+def listar_proyectos_por_cliente(client_id: str, client_repo, project_repo) -> list[Project]:
+    _get_client_or_raise(client_id, client_repo)
+    return [p for p in project_repo.list() if p.client_id == client_id]
+
+
+# 11d. Actualizar estado de proyecto
+def actualizar_estado_proyecto(project_id: str, new_status: str, project_repo) -> Project:
+    project = obtener_proyecto(project_id, project_repo)
+
+    valid_statuses = {"In Progress", "Completed"}
+    if new_status not in valid_statuses:
+        raise ValueError(
+            f"Estado '{new_status}' inválido. Debe ser uno de: {valid_statuses}"
+        )
+
+    project.project_status = new_status
+    project_repo.update(project)
+    return project
+
+
+# 12. Consultar trabajador por id
+def obtener_trabajador(worker_id: str, worker_repo) -> Worker:
+    return _get_worker_or_raise(worker_id, worker_repo)
+
+
+# 12b. Listar trabajadores
+def listar_trabajadores(worker_repo) -> list[Worker]:
+    return worker_repo.list()
+
+
+# 12c. Listar asignaciones por trabajador
+def listar_asignaciones_por_trabajador(worker_id: str, worker_repo, assignment_repo) -> list[WorkerAssigment]:
+    _get_worker_or_raise(worker_id, worker_repo)
+    return [a for a in assignment_repo.list() if a.worker_id == worker_id]
+
+
+# 12d. Listar asignaciones por proyecto
+def listar_asignaciones_por_proyecto(project_id: str, project_repo, assignment_repo) -> list[WorkerAssigment]:
+    _assert_project_exists(project_id, project_repo)
+    return [a for a in assignment_repo.list() if a.project_id == project_id]
+
 
 """Metodos creados para definir atributos de proyecto"""
 def definir_nombre_proyecto(

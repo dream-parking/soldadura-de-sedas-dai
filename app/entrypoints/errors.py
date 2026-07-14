@@ -2,7 +2,11 @@
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
-from app.service_layer.exceptions import NotFoundError, WorkerNotAssignedToProject
+from app.service_layer.exceptions import (
+    NotFoundError,
+    WorkerNotAssignedToProject,
+    QuoteNotApproved,
+)
 
 
 def register_exception_handlers(app: FastAPI) -> None:
@@ -14,6 +18,10 @@ def register_exception_handlers(app: FastAPI) -> None:
 
     @app.exception_handler(WorkerNotAssignedToProject)
     async def handle_conflict(request: Request, exc: WorkerNotAssignedToProject) -> JSONResponse:
+        return JSONResponse(status_code=409, content={"detail": str(exc)})
+
+    @app.exception_handler(QuoteNotApproved)
+    async def handle_quote_not_approved(request: Request, exc: QuoteNotApproved) -> JSONResponse:
         return JSONResponse(status_code=409, content={"detail": str(exc)})
 
     @app.exception_handler(ValueError)

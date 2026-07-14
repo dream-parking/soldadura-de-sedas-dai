@@ -18,5 +18,13 @@ class MaterialNotFound(NotFoundError):
     """El material solicitado no existe """
 
 
+class QuoteNotFound(NotFoundError):
+    """La cotización solicitada no existe"""
+
+
+class QuoteNotApproved(Exception):
+    """La cotización no está en estado Aprobado; no se puede crear el proyecto."""
+
+
 class WorkerNotAssignedToProject(Exception):
     """El trabajador no está asignado al proyecto"""

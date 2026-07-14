@@ -8,6 +8,7 @@ from app.entrypoints.schemas import (
     ClientCreate,
     ClientRead,
     QuoteCreate,
+    QuoteStatusUpdate,
     ProjectCreate,
     WorkerCreate,
     WorkerAssignmentCreate,
@@ -73,16 +74,27 @@ def test_client_read_builds_from_domain_object():
     assert schema.client_email is None
 
 
-def test_quote_create_rejects_status_outside_allowed_values():
+def test_quote_create_ignores_status_field_since_server_assigns_it():
+    """QuoteCreate ya no acepta quote_status: el estado inicial lo asigna
+    siempre el service layer como 'Pendiente'."""
+    quote = QuoteCreate(
+        quote_id="Q001",
+        client_id="C001",
+        quote_issue_date=date(2026, 1, 1),
+        quote_job_description="Techo",
+        quote_estimated_amount=1000.0,
+    )
+    assert not hasattr(quote, "quote_status")
+
+
+def test_quote_status_update_rejects_status_outside_allowed_values():
     with pytest.raises(ValidationError):
-        QuoteCreate(
-            quote_id="Q001",
-            client_id="C001",
-            quote_issue_date=date(2026, 1, 1),
-            quote_job_description="Techo",
-            quote_estimated_amount=1000.0,
-            quote_status="Cancelada",
-        )
+        QuoteStatusUpdate(quote_status="Cancelada")
+
+
+def test_quote_status_update_accepts_valid_status():
+    update = QuoteStatusUpdate(quote_status="Aprobado")
+    assert update.quote_status == "Aprobado"
 
 
 def test_quote_create_rejects_negative_amount():
