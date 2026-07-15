@@ -141,9 +141,33 @@ def agregar_material(
     material_repo.add(material)
     return material
 
+# Listar materiales
+def listar_materiales(material_repo) -> list[Material]:
+    return material_repo.list()
+
+#obtener material por id
+def obtener_material(material_id, material_repo) -> Material:
+    material = material_repo.get(material_id)
+    if material is None:
+        raise MaterialNotFound(f"No existe un material con id '{material_id}'")
+    return material
+
+# Actualizar material
+def actualizar_material(
+    material_id,
+    description: str,
+    specifications: str,
+    material_repo,
+) -> Material:
+    material = _assert_material_exists(material_id, material_repo)
+
+    material.description = description
+    material.specifications = specifications
+
+    material_repo.update(material)
+    return material
 
 # 5. Registrar uso de material en obra
-
 def registrar_uso_material_en_obra(
     project_id: str,
     material_id,
