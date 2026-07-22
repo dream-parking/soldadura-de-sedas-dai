@@ -1,0 +1,269 @@
+{
+  "info": {
+    "name": "Soldadura de Sedas API",
+    "description": "Colección de endpoints para la API de gestión de proyectos de Soldadura de Sedas. Cubre Clientes, Cotizaciones, Proyectos, Trabajadores, Estados de Cuenta y Solicitudes Quincenales.\n\nNOTA: Materiales y Nómina Quincenal aún no están conectados al api_router; se agregarán cuando estén listos.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "base_url", "value": "http://localhost:8000/api" },
+    { "key": "client_id", "value": "C001" },
+    { "key": "quote_id", "value": "Q001" },
+    { "key": "project_id", "value": "P001" },
+    { "key": "worker_id", "value": "W001" },
+    { "key": "assignment_id", "value": "A001" },
+    { "key": "statement_id", "value": "AS001" },
+    { "key": "request_id", "value": "BR001" }
+  ],
+  "item": [
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "Health check",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/health"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Clients",
+      "item": [
+        {
+          "name": "Crear cliente",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/clients",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"client_id\": \"{{client_id}}\",\n  \"client_company_name\": \"Constructora Alfa S.A.\",\n  \"client_phone\": \"22345678\",\n  \"registration_date\": \"2026-01-10\",\n  \"client_email\": \"contacto@alfa.com\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Listar clientes",
+          "request": { "method": "GET", "url": "{{base_url}}/clients" }
+        },
+        {
+          "name": "Obtener cliente por id",
+          "request": { "method": "GET", "url": "{{base_url}}/clients/{{client_id}}" }
+        },
+        {
+          "name": "Actualizar cliente",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/clients/{{client_id}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"client_company_name\": \"Constructora Alfa S.A. (actualizado)\",\n  \"client_phone\": \"22345679\",\n  \"registration_date\": \"2026-01-10\",\n  \"client_email\": \"contacto@alfa.com\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Quotes",
+      "item": [
+        {
+          "name": "Crear cotización",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/quotes",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"quote_id\": \"{{quote_id}}\",\n  \"client_id\": \"{{client_id}}\",\n  \"quote_issue_date\": \"2026-01-15\",\n  \"quote_job_description\": \"Techo industrial nave 2\",\n  \"quote_estimated_amount\": 15000.0,\n  \"notes\": \"Incluye estructura y lámina\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Obtener cotización por id",
+          "request": { "method": "GET", "url": "{{base_url}}/quotes/{{quote_id}}" }
+        },
+        {
+          "name": "Listar cotizaciones por cliente",
+          "request": { "method": "GET", "url": "{{base_url}}/quotes/by-client/{{client_id}}" }
+        },
+        {
+          "name": "Actualizar estado de cotización",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/quotes/{{quote_id}}/status",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"quote_status\": \"Aprobado\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Aprobar cotización",
+          "request": { "method": "POST", "url": "{{base_url}}/quotes/{{quote_id}}/approve" }
+        },
+        {
+          "name": "Rechazar cotización",
+          "request": { "method": "POST", "url": "{{base_url}}/quotes/{{quote_id}}/reject" }
+        }
+      ]
+    },
+    {
+      "name": "Projects",
+      "item": [
+        {
+          "name": "Crear proyecto desde cotización aprobada",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/projects",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"project_id\": \"{{project_id}}\",\n  \"quote_id\": \"{{quote_id}}\",\n  \"project_name\": \"Techo Bodega Norte\",\n  \"project_location\": \"Zona 12\",\n  \"project_start_date\": \"2026-02-01\",\n  \"project_estimated_end_date\": \"2026-04-01\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Obtener proyecto por id",
+          "request": { "method": "GET", "url": "{{base_url}}/projects/{{project_id}}" }
+        },
+        {
+          "name": "Listar proyectos por cliente",
+          "request": { "method": "GET", "url": "{{base_url}}/projects/by-client/{{client_id}}" }
+        },
+        {
+          "name": "Actualizar estado de proyecto",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/projects/{{project_id}}/status",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"project_status\": \"Completed\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Listar asignaciones del proyecto",
+          "request": { "method": "GET", "url": "{{base_url}}/projects/{{project_id}}/assignments" }
+        }
+      ]
+    },
+    {
+      "name": "Workers",
+      "item": [
+        {
+          "name": "Registrar trabajador",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/workers",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"worker_id\": \"{{worker_id}}\",\n  \"worker_name\": \"Juan Pérez\",\n  \"worker_role\": \"Soldador\",\n  \"worker_base_rate\": 150.0\n}"
+            }
+          }
+        },
+        {
+          "name": "Listar trabajadores",
+          "request": { "method": "GET", "url": "{{base_url}}/workers" }
+        },
+        {
+          "name": "Obtener trabajador por id",
+          "request": { "method": "GET", "url": "{{base_url}}/workers/{{worker_id}}" }
+        },
+        {
+          "name": "Asignar trabajador a proyecto",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/workers/{{worker_id}}/assignments",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"assignment_id\": \"{{assignment_id}}\",\n  \"project_id\": \"{{project_id}}\",\n  \"assignment_date\": \"2026-02-05\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Listar asignaciones del trabajador",
+          "request": { "method": "GET", "url": "{{base_url}}/workers/{{worker_id}}/assignments" }
+        }
+      ]
+    },
+    {
+      "name": "Account Statements (US-22)",
+      "item": [
+        {
+          "name": "Crear estado de cuenta",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/account-statements",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"{{statement_id}}\",\n  \"project_id\": \"{{project_id}}\",\n  \"date\": \"2026-02-15\",\n  \"initial_budget\": 15000.0,\n  \"amount_paid\": 5000.0\n}"
+            }
+          }
+        },
+        {
+          "name": "Obtener estado de cuenta por id",
+          "request": { "method": "GET", "url": "{{base_url}}/account-statements/{{statement_id}}" }
+        },
+        {
+          "name": "Listar estados de cuenta por proyecto",
+          "request": { "method": "GET", "url": "{{base_url}}/account-statements/by-project/{{project_id}}" }
+        },
+        {
+          "name": "Registrar pago",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/account-statements/{{statement_id}}/payment",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount_paid\": 12000.0\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Biweekly Requests (US-22)",
+      "item": [
+        {
+          "name": "Crear solicitud quincenal",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/biweekly-requests",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"{{request_id}}\",\n  \"project_id\": \"{{project_id}}\",\n  \"date\": \"2026-02-15\",\n  \"status\": \"Pendiente\",\n  \"amount\": 3000.0,\n  \"notes\": \"Pago de quincena para mano de obra\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Obtener solicitud por id",
+          "request": { "method": "GET", "url": "{{base_url}}/biweekly-requests/{{request_id}}" }
+        },
+        {
+          "name": "Listar solicitudes por proyecto",
+          "request": { "method": "GET", "url": "{{base_url}}/biweekly-requests/by-project/{{project_id}}" }
+        },
+        {
+          "name": "Actualizar estado de solicitud",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/biweekly-requests/{{request_id}}/status",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"Aprobada\"\n}"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
