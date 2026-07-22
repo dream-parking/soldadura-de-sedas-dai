@@ -20,6 +20,14 @@ class MaterialNotFound(NotFoundError):
 
 class QuoteNotFound(NotFoundError):
     """La cotización solicitada no existe"""
+    
+    
+class AccountStatementNotFound(NotFoundError):
+    """El estado de cuenta solicitado no existe"""
+
+
+class BiweeklyRequestNotFound(NotFoundError):
+    """La solicitud quincenal solicitada no existe"""
 
 
 class QuoteNotApproved(Exception):

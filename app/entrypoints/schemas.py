@@ -264,6 +264,10 @@ class BiweeklyRequestRead(BiweeklyRequestBase):
     model_config = ConfigDict(from_attributes=True)
 
 
+class BiweeklyRequestStatusUpdate(BaseModel):
+    status: Literal["Pendiente", "Aprobada", "Rechazada"]
+
+
 # Estado de cuenta
 
 class AccountStatementBase(BaseModel):
@@ -282,3 +286,7 @@ class AccountStatementRead(AccountStatementBase):
     model_config = ConfigDict(from_attributes=True)
 
     remaining_amount: float
+    
+    
+class AccountStatementPaymentUpdate(BaseModel):
+    amount_paid: float = Field(..., ge=0)

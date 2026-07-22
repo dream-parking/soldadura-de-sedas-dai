@@ -21,6 +21,8 @@ from app.service_layer.exceptions import (
     MaterialNotFound,
     QuoteNotFound,
     QuoteNotApproved,
+    AccountStatementNotFound,
+    BiweeklyRequestNotFound,
 )
 
 
@@ -55,6 +57,24 @@ def _get_quote_or_raise(quote_id: str, quote_repo) -> Quote:
     if quote is None:
         raise QuoteNotFound(f"No existe una cotización con id '{quote_id}'")
     return quote
+
+
+def _get_account_statement_or_raise(statement_id: str, statement_repo) -> AccountStatement:
+    statement = statement_repo.get(statement_id)
+    if statement is None:
+        raise AccountStatementNotFound(
+            f"No existe un estado de cuenta con id '{statement_id}'"
+        )
+    return statement
+
+
+def _get_biweekly_request_or_raise(request_id: str, request_repo) -> BiweeklyRequest:
+    request = request_repo.get(request_id)
+    if request is None:
+        raise BiweeklyRequestNotFound(
+            f"No existe una solicitud quincenal con id '{request_id}'"
+        )
+    return request
 
 
 # Registrar trabajador
@@ -272,6 +292,60 @@ def registrar_solicitud_quincenal(
     )
     request_repo.add(request)
     return request
+
+
+# 8b. Consultar solicitud quincenal por id
+def obtener_solicitud_quincenal(request_id: str, request_repo) -> BiweeklyRequest:
+    return _get_biweekly_request_or_raise(request_id, request_repo)
+
+
+# 8c. Listar solicitudes quincenales por proyecto
+def listar_solicitudes_por_proyecto(
+    project_id: str, project_repo, request_repo
+) -> list[BiweeklyRequest]:
+    _assert_project_exists(project_id, project_repo)
+    return [r for r in request_repo.list() if r.project_id == project_id]
+
+
+# 8d. Actualizar el estado de una solicitud quincenal (Pendiente/Aprobada/Rechazada)
+def actualizar_estado_solicitud_quincenal(
+    request_id: str, new_status: str, request_repo
+) -> BiweeklyRequest:
+    request = _get_biweekly_request_or_raise(request_id, request_repo)
+
+    valid_statuses = {"Pendiente", "Aprobada", "Rechazada"}
+    if new_status not in valid_statuses:
+        raise ValueError(
+            f"Estado '{new_status}' inválido. Debe ser uno de: {valid_statuses}"
+        )
+
+    request.status = new_status
+    request_repo.update(request)
+    return request
+
+
+# 7b. Consultar estado de cuenta por id
+def obtener_estado_de_cuenta(statement_id: str, statement_repo) -> AccountStatement:
+    return _get_account_statement_or_raise(statement_id, statement_repo)
+
+
+# 7c. Listar estados de cuenta por proyecto
+def listar_estados_de_cuenta_por_proyecto(
+    project_id: str, project_repo, statement_repo
+) -> list[AccountStatement]:
+    _assert_project_exists(project_id, project_repo)
+    return [s for s in statement_repo.list() if s.project_id == project_id]
+
+
+# 7d. Registrar un pago sobre un estado de cuenta existente
+def registrar_pago_estado_de_cuenta(
+    statement_id: str, amount_paid: float, statement_repo
+) -> AccountStatement:
+    statement = _get_account_statement_or_raise(statement_id, statement_repo)
+    statement.amount_paid = amount_paid
+    statement_repo.update(statement)
+    return statement
+
 
 #9. Registrar cliente
 def registrar_cliente(
