@@ -13,23 +13,23 @@ router = APIRouter(prefix="/materiales", tags=["materiales"])
 def create_material(payload: MaterialBase, uow: AbstractUnitOfWork = Depends(get_unit_of_work)) -> MaterialRead:
     with uow:
         material = services.agregar_material(
-            id=payload.id,
+            material_id=payload.id,
             description=payload.description,
             specifications=payload.specifications,
-            material_repo=uow.materiales
+            material_repo=uow.materials
         )
         return MaterialRead.model_validate(material)
 
 @router.get("", response_model=List[MaterialRead])
 def list_materiales(uow: AbstractUnitOfWork = Depends(get_unit_of_work)) -> List[MaterialRead]:
     with uow:
-        materiales = services.listar_materiales(uow.materiales)
+        materiales = services.listar_materiales(uow.materials)
         return [MaterialRead.model_validate(m) for m in materiales]
 
 @router.get("/{material_id}", response_model=MaterialRead)
-def get_material(material_id:str, uow: AbstractUnitOfWork = Depends(get_unit_of_work)) -> MaterialRead:
+def get_material(material_id: str, uow: AbstractUnitOfWork = Depends(get_unit_of_work)) -> MaterialRead:
     with uow:
-        material = services.obtener_material(material_id, uow.materiales)
+        material = services.obtener_material(material_id, uow.materials)
         return MaterialRead.model_validate(material)
     
 @router.put("/{material_id}", response_model=MaterialRead)
@@ -43,6 +43,6 @@ def update_material(
             material_id=material_id,
             description=payload.description,
             specifications=payload.specifications,
-            material_repo=uow.materiales
+            material_repo=uow.materials
         )
         return MaterialRead.model_validate(material)

@@ -16,8 +16,9 @@ Nota: `Material.id` se tipa como `str` (no `int`) porque así lo espera la colum
 real en app/adapters/orm.py (String(5)) y el resto de identificadores del dominio.
 """
 from datetime import date
-from typing import Literal, Optional
+from typing import List, Literal, Optional
 
+from app.adapters.unit_of_work import AbstractUnitOfWork
 from pydantic import BaseModel, ConfigDict, EmailStr, Field
 
 
@@ -175,11 +176,12 @@ class PayrollBase(BaseModel):
 
 
 class PayrollCreate(PayrollBase):
-    pass  
+    pass
 
 
 class PayrollRead(PayrollBase):
     model_config = ConfigDict(from_attributes=True)
+
 
 class PayrollUpdate(BaseModel):
     """Body para actualizar un PayRoll existente; el client_id viene de la URL."""
@@ -204,6 +206,11 @@ class MaterialCreate(MaterialBase):
     pass
 
 
+class MaterialUpdate(BaseModel):
+    description: str = Field(..., min_length=1, max_length=300)
+    specifications: str = Field(..., min_length=1, max_length=300)
+
+
 class MaterialRead(MaterialBase):
     model_config = ConfigDict(from_attributes=True)
 
@@ -221,8 +228,73 @@ class MaterialUsageDetailCreate(MaterialUsageDetailBase):
     pass
 
 
+class MaterialUsageDetailUpdate(BaseModel):
+    project_id: Optional[str] = Field(None, min_length=1, max_length=5)
+    material_id: Optional[str] = Field(None, min_length=1, max_length=5)
+    used_quantity: Optional[float] = Field(None, gt=0)
+    measurement_unit: Optional[str] = Field(None, min_length=1, max_length=10)
+
+
 class MaterialUsageDetailRead(MaterialUsageDetailBase):
     model_config = ConfigDict(from_attributes=True)
+
+
+def create_material_usage_detail(
+    schema: MaterialUsageDetailCreate, uow: AbstractUnitOfWork
+):
+    """
+    Crea y persiste un nuevo detalle de uso de material.
+    """
+    usage_detail_data = schema.model_dump()
+    new_detail = uow.material_usage_details.add(usage_detail_data)
+    return new_detail
+
+
+def get_material_usage_details(
+    skip: int, limit: int, uow: AbstractUnitOfWork
+) -> List:
+    """
+    Recupera una lista paginada de detalles de uso de material.
+    """
+    return uow.material_usage_details.get_all(skip=skip, limit=limit)
+
+
+def get_material_usage_detail_by_id(
+    detail_id: int, uow: AbstractUnitOfWork
+) -> Optional[object]:
+    """
+    Obtiene un detalle de uso de material por su ID.
+    """
+    return uow.material_usage_details.get_by_id(detail_id)
+
+
+def update_material_usage_detail(
+    detail_id: int, schema: MaterialUsageDetailUpdate, uow: AbstractUnitOfWork
+) -> Optional[object]:
+    """
+    Actualiza los campos presentes en el esquema de actualización.
+    """
+    detail = uow.material_usage_details.get_by_id(detail_id)
+    if not detail:
+        return None
+
+    update_data = schema.model_dump(exclude_unset=True)
+    updated_detail = uow.material_usage_details.update(detail_id, update_data)
+    return updated_detail
+
+
+def delete_material_usage_detail(
+    detail_id: int, uow: AbstractUnitOfWork
+) -> bool:
+    """
+    Elimina un detalle de uso de material si existe.
+    """
+    detail = uow.material_usage_details.get_by_id(detail_id)
+    if not detail:
+        return False
+
+    uow.material_usage_details.delete(detail_id)
+    return True
 
 
 # Medición técnica
@@ -241,8 +313,79 @@ class TechnicalMeasurementCreate(TechnicalMeasurementBase):
     pass
 
 
+class TechnicalMeasurementUpdate(BaseModel):
+    project_id: Optional[str] = Field(None, min_length=1, max_length=5)
+    dimensions: Optional[int] = Field(None, gt=0)
+    structure_type: Optional[str] = Field(None, min_length=1, max_length=100)
+    payment: Optional[float] = Field(None, ge=0)
+    unit: Optional[str] = Field(None, min_length=1, max_length=10)
+    notes: Optional[str] = Field(None, min_length=1, max_length=300)
+
+
 class TechnicalMeasurementRead(TechnicalMeasurementBase):
     model_config = ConfigDict(from_attributes=True)
+
+
+def create_technical_measurement(
+    schema: TechnicalMeasurementCreate, uow: AbstractUnitOfWork
+):
+    """
+    Crea y persiste una nueva medición técnica.
+    """
+    measurement_data = schema.model_dump()
+    new_measurement = uow.technical_measurements.add(measurement_data)
+    return new_measurement
+
+
+def get_technical_measurements(
+    skip: int, limit: int, uow: AbstractUnitOfWork
+) -> List:
+    """
+    Recupera una lista paginada de mediciones técnicas.
+    """
+    return uow.technical_measurements.get_all(skip=skip, limit=limit)
+
+
+def get_technical_measurement_by_id(
+    measurement_id: str, uow: AbstractUnitOfWork
+) -> Optional[object]:
+    """
+    Obtiene una medición técnica por su ID (alfanumérico).
+    """
+    return uow.technical_measurements.get_by_id(measurement_id)
+
+
+def update_technical_measurement(
+    measurement_id: str,
+    schema: TechnicalMeasurementUpdate,
+    uow: AbstractUnitOfWork,
+) -> Optional[object]:
+    """
+    Actualiza parcialmente una medición técnica.
+    """
+    measurement = uow.technical_measurements.get_by_id(measurement_id)
+    if not measurement:
+        return None
+
+    update_data = schema.model_dump(exclude_unset=True)
+    updated_measurement = uow.technical_measurements.update(
+        measurement_id, update_data
+    )
+    return updated_measurement
+
+
+def delete_technical_measurement(
+    measurement_id: str, uow: AbstractUnitOfWork
+) -> bool:
+    """
+    Elimina una medición técnica por su ID alfanumérico.
+    """
+    measurement = uow.technical_measurements.get_by_id(measurement_id)
+    if not measurement:
+        return False
+
+    uow.technical_measurements.delete(measurement_id)
+    return True
 
 
 # Solicitud quincenal
@@ -286,7 +429,7 @@ class AccountStatementRead(AccountStatementBase):
     model_config = ConfigDict(from_attributes=True)
 
     remaining_amount: float
-    
-    
+
+
 class AccountStatementPaymentUpdate(BaseModel):
     amount_paid: float = Field(..., ge=0)

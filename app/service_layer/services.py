@@ -155,6 +155,44 @@ def registrar_nomina_quincenal(
     return payroll
 
 
+def listar_nomina_quincenal(payroll_repo) -> list[Payroll]:
+    return payroll_repo.list()
+
+
+def obtener_nomina_quincenal(payroll_id: str, payroll_repo):
+    return payroll_repo.get(payroll_id)
+
+
+def actualizar_nomina_quincenal(
+    payroll_id: str,
+    worker_id: str,
+    project_id: str,
+    payroll_fortnight_period: str,
+    payroll_payment_date: date,
+    worker_repo,
+    project_repo,
+    payroll_repo,
+    payroll_hours_worked: Optional[float] = None,
+    payroll_paid_amount: Optional[float] = None,
+) -> Payroll | None:
+    payroll = payroll_repo.get(payroll_id)
+    if payroll is None:
+        return None
+
+    _get_worker_or_raise(worker_id, worker_repo)
+    _assert_project_exists(project_id, project_repo)
+
+    payroll.worker_id = worker_id
+    payroll.project_id = project_id
+    payroll.payroll_fortnight_period = payroll_fortnight_period
+    payroll.payroll_payment_date = payroll_payment_date
+    payroll.payroll_hours_worked = payroll_hours_worked
+    payroll.payroll_paid_amount = payroll_paid_amount
+
+    payroll_repo.update(payroll)
+    return payroll
+
+
 # Agregar material
 def agregar_material(
     material_id,
@@ -244,6 +282,56 @@ def registrar_medida_tecnica(
     )
     measurement_repo.add(measurement)
     return measurement
+
+
+def listar_medidas_tecnicas(measurement_repo) -> list[TechnicalMeasurement]:
+    return measurement_repo.list()
+
+
+def obtener_medida_tecnica(measurement_id: str, measurement_repo):
+    return measurement_repo.get(measurement_id)
+
+
+def actualizar_medida_tecnica(
+    measurement_id: str,
+    project_id: str | None,
+    dimensions: int | None,
+    structure_type: str | None,
+    payment: float | None,
+    unit: str | None,
+    notes: str | None,
+    measurement_repo,
+) -> TechnicalMeasurement | None:
+    measurement = measurement_repo.get(measurement_id)
+    if not measurement:
+        return None
+
+    if project_id is not None:
+        measurement.project_id = project_id
+    if dimensions is not None:
+        measurement.dimensions = dimensions
+    if structure_type is not None:
+        measurement.structure_type = structure_type
+    if payment is not None:
+        measurement.payment = payment
+    if unit is not None:
+        measurement.unit = unit
+    if notes is not None:
+        measurement.notes = notes
+
+    measurement_repo.update(measurement)
+    return measurement
+
+
+def delete_technical_measurement(measurement_id: str, measurement_repo) -> bool:
+    measurement = measurement_repo.get(measurement_id)
+    if not measurement:
+        return False
+
+    if hasattr(measurement_repo, "delete"):
+        measurement_repo.delete(measurement)
+        return True
+    raise NotImplementedError("El repositorio de mediciones técnicas no soporta eliminación")
 
 
 # 7. Registrar estado de cuenta
