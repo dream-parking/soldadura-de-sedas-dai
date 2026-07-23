@@ -206,6 +206,11 @@ class MaterialCreate(MaterialBase):
     pass
 
 
+class MaterialUpdate(BaseModel):
+    description: str = Field(..., min_length=1, max_length=300)
+    specifications: str = Field(..., min_length=1, max_length=300)
+
+
 class MaterialRead(MaterialBase):
     model_config = ConfigDict(from_attributes=True)
 

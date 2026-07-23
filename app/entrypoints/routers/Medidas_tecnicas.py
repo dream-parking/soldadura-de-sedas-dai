@@ -8,23 +8,9 @@ from app.entrypoints.dependencies import get_unit_of_work
 from app.entrypoints.schemas import (
     TechnicalMeasurementCreate,
     TechnicalMeasurementRead,
-    create_technical_measurement,
-    get_technical_measurement_by_id,
-    get_technical_measurements,
-    update_technical_measurement,
-    delete_technical_measurement
+    TechnicalMeasurementUpdate,
 )
 from app.service_layer import services
-
-
-# Esquema auxiliar para actualizaciones parciales
-class TechnicalMeasurementUpdate(BaseModel):
-    project_id: str | None = Field(None, min_length=1, max_length=5)
-    dimensions: int | None = Field(None, gt=0)
-    structure_type: str | None = Field(None, min_length=1, max_length=100)
-    payment: float | None = Field(None, ge=0)
-    unit: str | None = Field(None, min_length=1, max_length=10)
-    notes: str | None = Field(None, min_length=1, max_length=300)
 
 
 router = APIRouter(
@@ -46,7 +32,17 @@ def create_technical_measurement(
     Crea un nuevo registro de medición técnica.
     """
     with uow:
-        measurement = services.create_technical_measurement(schema=schema, uow=uow)
+        measurement = services.registrar_medida_tecnica(
+            measurement_id=schema.id,
+            project_id=schema.project_id,
+            dimensions=schema.dimensions,
+            structure_type=schema.structure_type,
+            payment=schema.payment,
+            unit=schema.unit,
+            notes=schema.notes,
+            project_repo=uow.projects,
+            measurement_repo=uow.technical_measurements,
+        )
         uow.commit()
     return measurement
 
@@ -65,8 +61,8 @@ def list_technical_measurements(
     Obtiene el listado de mediciones técnicas con paginación básica.
     """
     with uow:
-        measurements = services.get_technical_measurements(
-            skip=skip, limit=limit, uow=uow
+        measurements = services.listar_medidas_tecnicas(
+            measurement_repo=uow.technical_measurements
         )
     return measurements
 
@@ -84,8 +80,9 @@ def get_technical_measurement(
     Obtiene una medición técnica por su identificador (ID alfanumérico).
     """
     with uow:
-        measurement = services.get_technical_measurement_by_id(
-            measurement_id=measurement_id, uow=uow
+        measurement = services.obtener_medida_tecnica(
+            measurement_id=measurement_id,
+            measurement_repo=uow.technical_measurements,
         )
         if not measurement:
             raise HTTPException(
@@ -109,8 +106,15 @@ def update_technical_measurement(
     Actualiza parcialmente una medición técnica existente.
     """
     with uow:
-        measurement = services.update_technical_measurement(
-            measurement_id=measurement_id, schema=schema, uow=uow
+        measurement = services.actualizar_medida_tecnica(
+            measurement_id=measurement_id,
+            project_id=schema.project_id,
+            dimensions=schema.dimensions,
+            structure_type=schema.structure_type,
+            payment=schema.payment,
+            unit=schema.unit,
+            notes=schema.notes,
+            measurement_repo=uow.technical_measurements,
         )
         if not measurement:
             raise HTTPException(
@@ -134,7 +138,8 @@ def delete_technical_measurement(
     """
     with uow:
         success = services.delete_technical_measurement(
-            measurement_id=measurement_id, uow=uow
+            measurement_id=measurement_id,
+            measurement_repo=uow.technical_measurements,
         )
         if not success:
             raise HTTPException(

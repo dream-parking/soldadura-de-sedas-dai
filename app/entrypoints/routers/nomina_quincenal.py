@@ -20,20 +20,22 @@ def create_nomina_quincenal(payload: PayrollBase, uow: AbstractUnitOfWork = Depe
             payroll_payment_date=payload.payroll_payment_date,
             payroll_hours_worked=payload.payroll_hours_worked,
             payroll_paid_amount=payload.payroll_paid_amount,
-            payroll_repo=uow.nomina_quincenal
+            worker_repo=uow.workers,
+            project_repo=uow.projects,
+            payroll_repo=uow.payrolls
         )
         return PayrollRead.model_validate(nomina_quincenal)
 
 @router.get("", response_model=List[PayrollRead])
 def list_nomina_quincenal(uow: AbstractUnitOfWork = Depends(get_unit_of_work)) -> List[PayrollRead]:
     with uow:
-        nominas_quincenales = services.listar_nomina_quincenal(uow.nomina_quincenal)
+        nominas_quincenales = services.listar_nomina_quincenal(uow.payrolls)
         return [PayrollRead.model_validate(nq) for nq in nominas_quincenales]   
 
 @router.get("/{payroll_id}", response_model=PayrollRead)
 def get_nomina_quincenal(payroll_id: str, uow: AbstractUnitOfWork = Depends(get_unit_of_work)) -> PayrollRead:
     with uow:
-        nomina_quincenal = services.obtener_nomina_quincenal(payroll_id, uow.nomina_quincenal)
+        nomina_quincenal = services.obtener_nomina_quincenal(payroll_id, uow.payrolls)
         return PayrollRead.model_validate(nomina_quincenal) 
 
 @router.put("/{payroll_id}", response_model=PayrollRead)
@@ -44,12 +46,15 @@ def update_nomina_quincenal(
 ) -> PayrollRead:
     with uow:
         nomina_quincenal = services.actualizar_nomina_quincenal(
+            payroll_id=payroll_id,
             worker_id=payload.worker_id,
             project_id=payload.project_id,
             payroll_fortnight_period=payload.payroll_fortnight_period,
             payroll_payment_date=payload.payroll_payment_date,
             payroll_hours_worked=payload.payroll_hours_worked,
             payroll_paid_amount=payload.payroll_paid_amount,
-            payroll_repo=uow.nomina_quincenal
+            worker_repo=uow.workers,
+            project_repo=uow.projects,
+            payroll_repo=uow.payrolls
         )
         return PayrollRead.model_validate(nomina_quincenal)
