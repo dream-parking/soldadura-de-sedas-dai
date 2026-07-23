@@ -1,18 +1,54 @@
 {
   "info": {
     "name": "Soldadura de Sedas API",
-    "description": "Colección de endpoints para la API de gestión de proyectos de Soldadura de Sedas. Cubre Clientes, Cotizaciones, Proyectos, Trabajadores, Estados de Cuenta y Solicitudes Quincenales.\n\nNOTA: Materiales y Nómina Quincenal aún no están conectados al api_router; se agregarán cuando estén listos.",
+    "description": "Colección de endpoints para la API de gestión de proyectos de Soldadura de Sedas.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
-    { "key": "base_url", "value": "http://localhost:8000/api" },
-    { "key": "client_id", "value": "C001" },
-    { "key": "quote_id", "value": "Q001" },
-    { "key": "project_id", "value": "P001" },
-    { "key": "worker_id", "value": "W001" },
-    { "key": "assignment_id", "value": "A001" },
-    { "key": "statement_id", "value": "AS001" },
-    { "key": "request_id", "value": "BR001" }
+    {
+      "key": "base_url",
+      "value": "http://localhost:8000/api"
+    },
+    {
+      "key": "client_id",
+      "value": "C001"
+    },
+    {
+      "key": "quote_id",
+      "value": "Q001"
+    },
+    {
+      "key": "project_id",
+      "value": "P001"
+    },
+    {
+      "key": "worker_id",
+      "value": "W001"
+    },
+    {
+      "key": "assignment_id",
+      "value": "A001"
+    },
+    {
+      "key": "statement_id",
+      "value": "AS001"
+    },
+    {
+      "key": "request_id",
+      "value": "BR001"
+    },
+    {
+      "key": "material_id",
+      "value": "MAT01"
+    },
+    {
+      "key": "payroll_id",
+      "value": "PR001"
+    },
+    {
+      "key": "measurement_id",
+      "value": "TM001"
+    }
   ],
   "item": [
     {
@@ -34,7 +70,12 @@
           "name": "Crear cliente",
           "request": {
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "url": "{{base_url}}/clients",
             "body": {
               "mode": "raw",
@@ -44,17 +85,28 @@
         },
         {
           "name": "Listar clientes",
-          "request": { "method": "GET", "url": "{{base_url}}/clients" }
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/clients"
+          }
         },
         {
           "name": "Obtener cliente por id",
-          "request": { "method": "GET", "url": "{{base_url}}/clients/{{client_id}}" }
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/clients/{{client_id}}"
+          }
         },
         {
           "name": "Actualizar cliente",
           "request": {
             "method": "PUT",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "url": "{{base_url}}/clients/{{client_id}}",
             "body": {
               "mode": "raw",
@@ -71,7 +123,12 @@
           "name": "Crear cotización",
           "request": {
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "url": "{{base_url}}/quotes",
             "body": {
               "mode": "raw",
@@ -81,17 +138,28 @@
         },
         {
           "name": "Obtener cotización por id",
-          "request": { "method": "GET", "url": "{{base_url}}/quotes/{{quote_id}}" }
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/quotes/{{quote_id}}"
+          }
         },
         {
           "name": "Listar cotizaciones por cliente",
-          "request": { "method": "GET", "url": "{{base_url}}/quotes/by-client/{{client_id}}" }
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/quotes/by-client/{{client_id}}"
+          }
         },
         {
           "name": "Actualizar estado de cotización",
           "request": {
             "method": "PATCH",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "url": "{{base_url}}/quotes/{{quote_id}}/status",
             "body": {
               "mode": "raw",
@@ -101,11 +169,17 @@
         },
         {
           "name": "Aprobar cotización",
-          "request": { "method": "POST", "url": "{{base_url}}/quotes/{{quote_id}}/approve" }
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/quotes/{{quote_id}}/approve"
+          }
         },
         {
           "name": "Rechazar cotización",
-          "request": { "method": "POST", "url": "{{base_url}}/quotes/{{quote_id}}/reject" }
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/quotes/{{quote_id}}/reject"
+          }
         }
       ]
     },
@@ -116,7 +190,12 @@
           "name": "Crear proyecto desde cotización aprobada",
           "request": {
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "url": "{{base_url}}/projects",
             "body": {
               "mode": "raw",
@@ -126,17 +205,28 @@
         },
         {
           "name": "Obtener proyecto por id",
-          "request": { "method": "GET", "url": "{{base_url}}/projects/{{project_id}}" }
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/projects/{{project_id}}"
+          }
         },
         {
           "name": "Listar proyectos por cliente",
-          "request": { "method": "GET", "url": "{{base_url}}/projects/by-client/{{client_id}}" }
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/projects/by-client/{{client_id}}"
+          }
         },
         {
           "name": "Actualizar estado de proyecto",
           "request": {
             "method": "PATCH",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "url": "{{base_url}}/projects/{{project_id}}/status",
             "body": {
               "mode": "raw",
@@ -146,7 +236,10 @@
         },
         {
           "name": "Listar asignaciones del proyecto",
-          "request": { "method": "GET", "url": "{{base_url}}/projects/{{project_id}}/assignments" }
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/projects/{{project_id}}/assignments"
+          }
         }
       ]
     },
@@ -157,7 +250,12 @@
           "name": "Registrar trabajador",
           "request": {
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "url": "{{base_url}}/workers",
             "body": {
               "mode": "raw",
@@ -167,17 +265,28 @@
         },
         {
           "name": "Listar trabajadores",
-          "request": { "method": "GET", "url": "{{base_url}}/workers" }
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/workers"
+          }
         },
         {
           "name": "Obtener trabajador por id",
-          "request": { "method": "GET", "url": "{{base_url}}/workers/{{worker_id}}" }
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/workers/{{worker_id}}"
+          }
         },
         {
           "name": "Asignar trabajador a proyecto",
           "request": {
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "url": "{{base_url}}/workers/{{worker_id}}/assignments",
             "body": {
               "mode": "raw",
@@ -187,7 +296,10 @@
         },
         {
           "name": "Listar asignaciones del trabajador",
-          "request": { "method": "GET", "url": "{{base_url}}/workers/{{worker_id}}/assignments" }
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/workers/{{worker_id}}/assignments"
+          }
         }
       ]
     },
@@ -198,7 +310,12 @@
           "name": "Crear estado de cuenta",
           "request": {
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "url": "{{base_url}}/account-statements",
             "body": {
               "mode": "raw",
@@ -208,17 +325,28 @@
         },
         {
           "name": "Obtener estado de cuenta por id",
-          "request": { "method": "GET", "url": "{{base_url}}/account-statements/{{statement_id}}" }
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/account-statements/{{statement_id}}"
+          }
         },
         {
           "name": "Listar estados de cuenta por proyecto",
-          "request": { "method": "GET", "url": "{{base_url}}/account-statements/by-project/{{project_id}}" }
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/account-statements/by-project/{{project_id}}"
+          }
         },
         {
           "name": "Registrar pago",
           "request": {
             "method": "PATCH",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "url": "{{base_url}}/account-statements/{{statement_id}}/payment",
             "body": {
               "mode": "raw",
@@ -235,7 +363,12 @@
           "name": "Crear solicitud quincenal",
           "request": {
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "url": "{{base_url}}/biweekly-requests",
             "body": {
               "mode": "raw",
@@ -245,22 +378,199 @@
         },
         {
           "name": "Obtener solicitud por id",
-          "request": { "method": "GET", "url": "{{base_url}}/biweekly-requests/{{request_id}}" }
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/biweekly-requests/{{request_id}}"
+          }
         },
         {
           "name": "Listar solicitudes por proyecto",
-          "request": { "method": "GET", "url": "{{base_url}}/biweekly-requests/by-project/{{project_id}}" }
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/biweekly-requests/by-project/{{project_id}}"
+          }
         },
         {
           "name": "Actualizar estado de solicitud",
           "request": {
             "method": "PATCH",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "url": "{{base_url}}/biweekly-requests/{{request_id}}/status",
             "body": {
               "mode": "raw",
               "raw": "{\n  \"status\": \"Aprobada\"\n}"
             }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Materiales",
+      "item": [
+        {
+          "name": "Crear material",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/materiales",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"{{material_id}}\",\n  \"description\": \"Lámina galvanizada calibre 26\",\n  \"specifications\": \"2.44m x 1.10m, acabado zinc\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Listar materiales",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/materiales"
+          }
+        },
+        {
+          "name": "Obtener material por id",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/materiales/{{material_id}}"
+          }
+        },
+        {
+          "name": "Actualizar material",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/materiales/{{material_id}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"description\": \"Lámina galvanizada calibre 26 (actualizada)\",\n  \"specifications\": \"2.44m x 1.10m, acabado zinc reforzado\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Nómina Quincenal",
+      "item": [
+        {
+          "name": "Registrar nómina quincenal",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/nomina_quincenal",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"payroll_id\": \"{{payroll_id}}\",\n  \"worker_id\": \"{{worker_id}}\",\n  \"project_id\": \"{{project_id}}\",\n  \"payroll_fortnight_period\": \"2026-02-01/2026-02-15\",\n  \"payroll_payment_date\": \"2026-02-16\",\n  \"payroll_hours_worked\": 80,\n  \"payroll_paid_amount\": 3200.0\n}"
+            }
+          }
+        },
+        {
+          "name": "Listar nóminas quincenales",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/nomina_quincenal"
+          }
+        },
+        {
+          "name": "Obtener nómina por id",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/nomina_quincenal/{{payroll_id}}"
+          }
+        },
+        {
+          "name": "Actualizar nómina quincenal",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/nomina_quincenal/{{payroll_id}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"worker_id\": \"{{worker_id}}\",\n  \"project_id\": \"{{project_id}}\",\n  \"payroll_fortnight_period\": \"2026-02-01/2026-02-15\",\n  \"payroll_payment_date\": \"2026-02-17\",\n  \"payroll_hours_worked\": 88,\n  \"payroll_paid_amount\": 3520.0\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Mediciones Técnicas",
+      "item": [
+        {
+          "name": "Crear medición técnica",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/technical-measurements/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"{{measurement_id}}\",\n  \"project_id\": \"{{project_id}}\",\n  \"dimensions\": 120,\n  \"structure_type\": \"Techo a dos aguas\",\n  \"payment\": 4500.0,\n  \"unit\": \"m2\",\n  \"notes\": \"Medición inicial de obra\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Listar mediciones técnicas",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/technical-measurements/?skip=0&limit=100"
+          }
+        },
+        {
+          "name": "Obtener medición por id",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/technical-measurements/{{measurement_id}}"
+          }
+        },
+        {
+          "name": "Actualizar medición técnica (parcial)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/technical-measurements/{{measurement_id}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"payment\": 4800.0,\n  \"notes\": \"Medición ajustada tras revisión\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Eliminar medición técnica",
+          "request": {
+            "method": "DELETE",
+            "url": "{{base_url}}/technical-measurements/{{measurement_id}}"
           }
         }
       ]

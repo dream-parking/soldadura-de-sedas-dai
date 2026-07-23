@@ -1,11 +1,12 @@
-"""
+"""scripts/test_api_manual.py
 
-Script de pruebas manuales con la librería `requests` 
+Script de pruebas manuales con la librería `requests` (Python Crash Course,
+Cap. Proyectos: consumo práctico de APIs REST).
 
 Recorre el flujo completo de negocio: Cliente -> Cotización -> Proyecto ->
 Trabajador -> Estado de Cuenta -> Solicitud Quincenal. 
 
-Requiere que la API esté corriendo localmente 
+Requiere que la API esté corriendo localmente (por ejemplo con `uvicorn`)
 y que la base de datos esté vacía o que los IDs usados aquí no existan
 todavía (si ya existen, la API va a responder 409/400 por duplicados).
 
@@ -133,6 +134,81 @@ def main() -> None:
         requests.patch(f"{BASE_URL}/biweekly-requests/BR900/status", json={"status": "Aprobada"}),
         200,
     )
+
+    # 8. Registrar un material y actualizarlo
+    _print_step("8. Crear material")
+    material_payload = {
+        "id": "MAT90",
+        "description": "Lámina galvanizada calibre 26",
+        "specifications": "2.44m x 1.10m, acabado zinc",
+    }
+    _check(requests.post(f"{BASE_URL}/materiales", json=material_payload), 201)
+
+    _print_step("8b. Actualizar material")
+    _check(
+        requests.put(
+            f"{BASE_URL}/materiales/MAT90",
+            json={
+                "description": "Lámina galvanizada calibre 26 (actualizada)",
+                "specifications": "2.44m x 1.10m, acabado zinc reforzado",
+            },
+        ),
+        200,
+    )
+
+    # 9. Registrar nómina quincenal del trabajador ya asignado y actualizarla
+    _print_step("9. Registrar nómina quincenal")
+    payroll_payload = {
+        "payroll_id": "PR900",
+        "worker_id": "W900",
+        "project_id": "P900",
+        "payroll_fortnight_period": "2026-02-01/2026-02-15",
+        "payroll_payment_date": "2026-02-16",
+        "payroll_hours_worked": 80,
+        "payroll_paid_amount": 3200.0,
+    }
+    _check(requests.post(f"{BASE_URL}/nomina_quincenal", json=payroll_payload), 201)
+
+    _print_step("9b. Actualizar nómina quincenal")
+    _check(
+        requests.put(
+            f"{BASE_URL}/nomina_quincenal/PR900",
+            json={
+                "worker_id": "W900",
+                "project_id": "P900",
+                "payroll_fortnight_period": "2026-02-01/2026-02-15",
+                "payroll_payment_date": "2026-02-17",
+                "payroll_hours_worked": 88,
+                "payroll_paid_amount": 3520.0,
+            },
+        ),
+        200,
+    )
+
+    # 10. Crear, actualizar y eliminar una medición técnica del proyecto
+    _print_step("10. Crear medición técnica")
+    measurement_payload = {
+        "id": "TM900",
+        "project_id": "P900",
+        "dimensions": 120,
+        "structure_type": "Techo a dos aguas",
+        "payment": 4500.0,
+        "unit": "m2",
+        "notes": "Medición inicial de obra",
+    }
+    _check(requests.post(f"{BASE_URL}/technical-measurements/", json=measurement_payload), 201)
+
+    _print_step("10b. Actualizar medición técnica (parcial)")
+    _check(
+        requests.patch(
+            f"{BASE_URL}/technical-measurements/TM900",
+            json={"payment": 4800.0, "notes": "Medición ajustada tras revisión"},
+        ),
+        200,
+    )
+
+    _print_step("10c. Eliminar medición técnica")
+    _check(requests.delete(f"{BASE_URL}/technical-measurements/TM900"), 204)
 
     _print_step("Flujo completo terminado sin errores ✅")
 
