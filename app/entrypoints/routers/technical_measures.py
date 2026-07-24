@@ -1,8 +1,8 @@
 from typing import List
-
+ 
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel, Field
-
+ 
 from app.adapters.unit_of_work import AbstractUnitOfWork
 from app.entrypoints.dependencies import get_unit_of_work
 from app.entrypoints.schemas import (
@@ -11,14 +11,14 @@ from app.entrypoints.schemas import (
     TechnicalMeasurementUpdate,
 )
 from app.service_layer import services
-
-
+ 
+ 
 router = APIRouter(
     prefix="/technical-measurements",
     tags=["Technical Measurements"],
 )
-
-
+ 
+ 
 @router.post(
     "/",
     response_model=TechnicalMeasurementRead,
@@ -43,10 +43,9 @@ def create_technical_measurement(
             project_repo=uow.projects,
             measurement_repo=uow.technical_measurements,
         )
-        uow.commit()
-    return measurement
-
-
+        return TechnicalMeasurementRead.model_validate(measurement)
+ 
+ 
 @router.get(
     "/",
     response_model=List[TechnicalMeasurementRead],
@@ -64,9 +63,9 @@ def list_technical_measurements(
         measurements = services.listar_medidas_tecnicas(
             measurement_repo=uow.technical_measurements
         )
-    return measurements
-
-
+        return measurements
+ 
+ 
 @router.get(
     "/{measurement_id}",
     response_model=TechnicalMeasurementRead,
@@ -89,9 +88,9 @@ def get_technical_measurement(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail=f"Medición técnica con ID '{measurement_id}' no encontrada",
             )
-    return measurement
-
-
+        return measurement
+ 
+ 
 @router.patch(
     "/{measurement_id}",
     response_model=TechnicalMeasurementRead,
@@ -121,10 +120,9 @@ def update_technical_measurement(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail=f"Medición técnica con ID '{measurement_id}' no encontrada",
             )
-        uow.commit()
-    return measurement
-
-
+        return TechnicalMeasurementRead.model_validate(measurement)
+ 
+ 
 @router.delete(
     "/{measurement_id}",
     status_code=status.HTTP_204_NO_CONTENT,
