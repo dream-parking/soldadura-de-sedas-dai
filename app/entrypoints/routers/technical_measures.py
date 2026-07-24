@@ -43,8 +43,12 @@ def create_technical_measurement(
             project_repo=uow.projects,
             measurement_repo=uow.technical_measurements,
         )
+<<<<<<< HEAD
+        return TechnicalMeasurementRead.model_validate(measurement)
+=======
         uow.commit()
         return measurement
+>>>>>>> 8bb0fe2c1eedd99884111581a69bc3a2301a9d12
  
  
 @router.get(
@@ -121,8 +125,12 @@ def update_technical_measurement(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail=f"Medición técnica con ID '{measurement_id}' no encontrada",
             )
+<<<<<<< HEAD
+        return TechnicalMeasurementRead.model_validate(measurement)
+=======
         uow.commit()
         return measurement
+>>>>>>> 8bb0fe2c1eedd99884111581a69bc3a2301a9d12
  
  
 @router.delete(
